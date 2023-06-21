@@ -195,7 +195,7 @@ class GraphHTML:
     def _get_node_columns(self, node_name):
         graph_node = self.graph.get_node(node_name)
         if graph_node["transformation"].output_schema:
-            columns = [
+            return [
                 {
                     "name": column.name,
                     "type": column.type.__class__.__name__,
@@ -203,32 +203,29 @@ class GraphHTML:
                 }
                 for column in graph_node["transformation"].output_schema.columns
             ]
-        else:
-            # If the node has no schema defined then we work out what columns exist based on what dependencies of the
-            # node are requesting.
-            successors = sorted(list(self.graph.graph.successors(node_name)))
-            requested_columns = set()
-            for successor in successors:
-                successor_dependency_definition = [
-                    dependency_definition
-                    for dependency_definition in self.graph.get_node(successor)[
-                        "transformation"
-                    ].input_nodes
-                    if dependency_definition.key == node_name
-                ][0]
-                if successor_dependency_definition.selected_columns:
-                    for column in successor_dependency_definition.selected_columns:
-                        requested_columns.add(column)
-            columns = [
-                {
-                    "name": column,
-                    "type": Unknown.__name__,
-                    "description": "",
-                }
-                for column in sorted(list(requested_columns))
-            ]
-
-        return columns
+        # If the node has no schema defined then we work out what columns exist based on what dependencies of the
+        # node are requesting.
+        successors = sorted(list(self.graph.graph.successors(node_name)))
+        requested_columns = set()
+        for successor in successors:
+            successor_dependency_definition = [
+                dependency_definition
+                for dependency_definition in self.graph.get_node(successor)[
+                    "transformation"
+                ].input_nodes
+                if dependency_definition.key == node_name
+            ][0]
+            if successor_dependency_definition.selected_columns:
+                for column in successor_dependency_definition.selected_columns:
+                    requested_columns.add(column)
+        return [
+            {
+                "name": column,
+                "type": Unknown.__name__,
+                "description": "",
+            }
+            for column in sorted(list(requested_columns))
+        ]
 
     @property
     def edges(self):

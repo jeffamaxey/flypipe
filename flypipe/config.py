@@ -36,8 +36,7 @@ class _Config:
             raise KeyError(
                 f'Config option "{config_name}" is invalid, available options are {cls.VALID_OPTIONS}'
             )
-        active_config = cls.get_active_config()
-        if active_config:
+        if active_config := cls.get_active_config():
             return active_config.get_config_from_context_manager(config_name)
         environment_config = cls._get_config_from_environment_variables(config_name)
         if environment_config is not None:
@@ -77,9 +76,7 @@ class _Config:
 
     @classmethod
     def get_active_config(cls):
-        if cls.ACTIVE_CONFIGS:
-            return cls.ACTIVE_CONFIGS[-1]
-        return None
+        return cls.ACTIVE_CONFIGS[-1] if cls.ACTIVE_CONFIGS else None
 
 
 def get_config(config_name):

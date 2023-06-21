@@ -28,9 +28,7 @@ def get_spark():
     )
 
     thrift_url = "thrift://hive-metastore:9083"
-    thrift_server_available = url_ok(thrift_url)
-
-    if thrift_server_available:
+    if thrift_server_available := url_ok(thrift_url):
         configs = (
             configs.config("hive.metastore.uris", thrift_url)
             .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")

@@ -15,10 +15,9 @@ REPO_NAME = "flypipe"
 def get_redirect_url():
     if os.path.exists('./build/html/main'):
         return './html/main/index.html'
-    else:
-        doc_versions = os.listdir('./build/html/release')
-        version = max(doc_versions)
-        return f'./html/release/{version}/index.html'
+    doc_versions = os.listdir('./build/html/release')
+    version = max(doc_versions)
+    return f'./html/release/{version}/index.html'
 
 
 environment = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath="./"))

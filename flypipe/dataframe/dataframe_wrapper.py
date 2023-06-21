@@ -83,13 +83,12 @@ class DataFrameWrapper(ABC):
                     column, flypipe_type
                 )
             except AttributeError as exc:
-                if flypipe_type.key() in self.FLYPIPE_TYPE_TO_DF_TYPE_MAP:
-                    df_type = self.FLYPIPE_TYPE_TO_DF_TYPE_MAP[flypipe_type.key()]
-                    result = self._cast_column(column, flypipe_type, df_type)
-                else:
+                if flypipe_type.key() not in self.FLYPIPE_TYPE_TO_DF_TYPE_MAP:
                     raise TypeError(
                         f"Unable to cast to flypipe type {flypipe_type.name}- no dataframe type registered"
                     ) from exc
+                df_type = self.FLYPIPE_TYPE_TO_DF_TYPE_MAP[flypipe_type.key()]
+                result = self._cast_column(column, flypipe_type, df_type)
         return result
 
     @abstractmethod

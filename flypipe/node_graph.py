@@ -303,10 +303,9 @@ class NodeGraph:
         return self.get_node(name)["transformation"]
 
     def get_end_node_name(self):
-        for name in self.graph:
-            if self.graph.out_degree[name] == 0:
-                return name
-        return None
+        return next(
+            (name for name in self.graph if self.graph.out_degree[name] == 0), None
+        )
 
     def calculate_graph_run_status(self):
         # because the last node can be a generator, we have to get the last node node
@@ -320,7 +319,7 @@ class NodeGraph:
                 RunStatus.SKIP if node_name in skipped_node_keys else RunStatus.ACTIVE,
             )
         ]
-        while len(frontier) != 0:
+        while frontier:
             current_node_name, descendent_status = frontier.pop()
             current_node = self.graph.nodes[current_node_name]
             if descendent_status == RunStatus.ACTIVE:
@@ -337,9 +336,7 @@ class NodeGraph:
                         frontier.append((ancestor_name, RunStatus.SKIP))
 
     def get_dependency_map(self):
-        dependencies = {}
-        for node in self.graph.nodes:
-            dependencies[node] = set()
+        dependencies = {node: set() for node in self.graph.nodes}
         for source, destination in self.graph.edges:
             dependencies[destination].add(source)
         return dependencies
@@ -388,8 +385,7 @@ class NodeGraph:
             lambda node_name: self.graph.nodes[node_name]["status"] == RunStatus.ACTIVE,
             candidate_node_names,
         )
-        runnable_nodes = [self.get_node(node_name) for node_name in runnable_node_names]
-        return runnable_nodes
+        return [self.get_node(node_name) for node_name in runnable_node_names]
 
     def is_empty(self):
         return nx.number_of_nodes(self.graph) == 0
@@ -409,10 +405,11 @@ class NodeGraph:
         execution_graph = NodeGraph(
             None, graph=self.graph.copy(), skipped_node_keys=self.skipped_node_keys
         )
-        to_remove = []
-        for node_name in execution_graph.graph.nodes:
-            if execution_graph.get_node(node_name)["status"] == RunStatus.SKIP:
-                to_remove.append(node_name)
+        to_remove = [
+            node_name
+            for node_name in execution_graph.graph.nodes
+            if execution_graph.get_node(node_name)["status"] == RunStatus.SKIP
+        ]
         for node_name in to_remove:
             execution_graph.remove_node(node_name)
         return execution_graph

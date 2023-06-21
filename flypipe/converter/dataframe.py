@@ -73,7 +73,4 @@ class DataFrameConverter:  # pylint: disable=too-few-public-methods
 
         from_type = dataframe_type(df)
 
-        if from_type == to_type:
-            return df
-
-        return self._strategy(from_type, to_type)(df)
+        return df if from_type == to_type else self._strategy(from_type, to_type)(df)

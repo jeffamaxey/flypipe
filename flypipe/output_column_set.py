@@ -22,6 +22,4 @@ class OutputColumnSet:
                 self.columns.add(column)
 
     def get_columns(self):
-        if self.columns is None:
-            return None
-        return sorted(list(self.columns))
+        return None if self.columns is None else sorted(list(self.columns))

@@ -58,11 +58,11 @@ class Node:  # pylint: disable=too-many-instance-attributes
             self.description = description
         elif self.function.__doc__:
             self.description = self.function.__doc__.strip()
+        elif get_config("require_node_description"):
+            raise ValueError(
+                f"Node description configured as mandatory but no description provided for node {self.__name__}"
+            )
         else:
-            if get_config("require_node_description"):
-                raise ValueError(
-                    f"Node description configured as mandatory but no description provided for node {self.__name__}"
-                )
             self.description = ""
 
         self.group = group
@@ -359,15 +359,15 @@ class Node:  # pylint: disable=too-many-instance-attributes
         set of columns selected by descendant nodes.
         """
         if output_schema:
-            schema = output_schema
+            return output_schema
         elif output_columns is not None:
-            columns = []
-            for output_column in output_columns:
-                columns.append(Column(output_column, Unknown(), ""))
-            schema = Schema(columns)
+            columns = [
+                Column(output_column, Unknown(), "")
+                for output_column in output_columns
+            ]
+            return Schema(columns)
         else:
-            schema = None
-        return schema
+            return None
 
     def process_transformation(
         self, spark, requested_columns: list, run_context: NodeRunContext, **inputs
@@ -386,12 +386,12 @@ class Node:  # pylint: disable=too-many-instance-attributes
 
         result = self.function(**parameters)
         if self.type == "spark_sql":
-            # Spark SQL functions only return the text of a SQL query, we will need to execute this command.
-            if not spark:
+            if spark:
+                result = spark.sql(result)
+            else:
                 raise ValueError(
                     "Unable to run spark_sql type node without spark being provided in the transformation.run call"
                 )
-            result = spark.sql(result)
         return result
 
     def plot(self):

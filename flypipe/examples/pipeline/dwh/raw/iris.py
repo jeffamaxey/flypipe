@@ -20,8 +20,7 @@ from flypipe.schema.types import Float, Integer
 )
 def iris():
     iris = datasets.load_iris()
-    # pylint: disable=no-member
-    df = pd.DataFrame(
+    return pd.DataFrame(
         data={
             "sepal_length": iris.data[:, 0],
             "sepal_width": iris.data[:, 1],
@@ -30,6 +29,3 @@ def iris():
             "target": iris.target,
         }
     )
-    # pylint: enable=no-member
-
-    return df

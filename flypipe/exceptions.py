@@ -82,12 +82,14 @@ class DataFrameMissingColumns(Exception):
         )
         for not_found_selected_column in not_found_selected_columns:
 
-            selected_col = None
-            for col in selected_columns:
-                if col.lower() == not_found_selected_column:
-                    selected_col = col
-                    break
-
+            selected_col = next(
+                (
+                    col
+                    for col in selected_columns
+                    if col.lower() == not_found_selected_column
+                ),
+                None,
+            )
             error_df.loc[error_df.shape[0]] = ["", selected_col, "not found"]
 
         error_df = error_df.sort_values(["selection", "dataframe"]).reset_index(
