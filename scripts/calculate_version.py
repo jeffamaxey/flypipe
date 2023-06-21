@@ -15,6 +15,7 @@ We leverage these to get the appropriate version for new releases in the followi
     version and the resultant version number is our new release number.
 """
 
+
 import subprocess
 import re
 
@@ -25,19 +26,9 @@ all_branches = (
     .decode("utf-8")
     .split()
 )
-release_branches = [
+if release_branches := [
     branch for branch in all_branches if branch.startswith("origin/release/")
-]
-if not release_branches:
-    # Unable to find a previous release
-    latest_version = [0, 0, 0]
-    print(f'Check diff for HEAD')
-    commit_list = (
-        subprocess.check_output(f"git rev-list HEAD --no-merges", shell=True)
-        .decode("utf-8")
-        .split()
-    )
-else:
+]:
     latest_version_branch_name = max(release_branches)
     latest_version = [int(num) for num in latest_version_branch_name[15:].split(".")]
     print(f'Check diff between {latest_version_branch_name} and HEAD')
@@ -49,6 +40,15 @@ else:
         .split()
     )
 
+else:
+    # Unable to find a previous release
+    latest_version = [0, 0, 0]
+    print('Check diff for HEAD')
+    commit_list = (
+        subprocess.check_output("git rev-list HEAD --no-merges", shell=True)
+        .decode("utf-8")
+        .split()
+    )
 new_version = latest_version
 if not commit_list:
     raise Exception("Release would be made without any commits, aborting")
@@ -62,10 +62,9 @@ for commit_id in commit_list:
     print(f'Checking msg {commit_message} (commit id {commit_id})')
     commit_message_summary = commit_message.split("\n", maxsplit=1)[0]
     print(f'Check commit "{commit_message_summary}"')
-    commit_type_match = re.search(RE_COMMIT_TYPE, commit_message_summary)
-    if commit_type_match:
+    if commit_type_match := re.search(RE_COMMIT_TYPE, commit_message_summary):
         print(' *** commit contains a type')
-        commit_type_str = commit_type_match.group(1)
+        commit_type_str = commit_type_match[1]
         if commit_type_str[-1] == '!':
             print(' *** detected breaking change')
             is_breaking_change = True

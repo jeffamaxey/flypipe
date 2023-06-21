@@ -19,7 +19,7 @@ os.chdir("../..")
 from flypipe import __version__
 from datetime import datetime
 
-today = datetime.today()
+today = datetime.now()
 # -- Project information -----------------------------------------------------
 
 project = "Flypipe"

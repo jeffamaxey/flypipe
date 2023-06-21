@@ -10,10 +10,7 @@ class Schema:
         self.columns = columns[0] if isinstance(columns[0], list) else list(columns)
 
     def get(self, column):
-        for col in self.columns:
-            if col.name == column:
-                return col
-        return None
+        return next((col for col in self.columns if col.name == column), None)
 
     def get_column_names(self):
         return [column.name for column in self.columns]

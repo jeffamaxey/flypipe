@@ -93,6 +93,5 @@ class Catalog:
             for tag in catalog_node.node.tags:
                 if tag in tag_count:
                     tag_count[tag] += 1
-        for tag in tags:
-            count_box_defs.append({"label": tag, "count": tag_count[tag]})
+        count_box_defs.extend({"label": tag, "count": tag_count[tag]} for tag in tags)
         return count_box_defs

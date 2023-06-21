@@ -76,6 +76,4 @@ def get_schema(df, columns=None):
             for s in (df if not columns else df.select(columns)).schema
         }
 
-    if not columns:
-        return df.dtypes
-    return df.dtypes[columns]
+    return df.dtypes if not columns else df.dtypes[columns]

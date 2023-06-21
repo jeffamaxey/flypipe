@@ -41,13 +41,11 @@ class NodeResult:
         return self.cached_conversions[df_type]
 
     def _as_type(self, df_type: DataFrameType):
-        if self.df_wrapper.DF_TYPE == df_type:
-            dataframe = self.df_wrapper
-        else:
-            # TODO- is this a good idea? We are having to reach into self.df_wrapper to grab the df, this usually is a
-            # mark of a design issue
-            dataframe = DataFrameWrapper.get_instance(
+        return (
+            self.df_wrapper
+            if self.df_wrapper.DF_TYPE == df_type
+            else DataFrameWrapper.get_instance(
                 self.spark,
                 self.dataframe_converter.convert(self.df_wrapper.df, df_type),
             )
-        return dataframe
+        )
